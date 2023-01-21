@@ -1,0 +1,14 @@
+---
+- name: Set a hostname
+  hosts: all
+  become: true
+  tasks:
+    - name: Set a hostname
+      hostname:
+        name: "{{ inventory_hostname }}"
+
+- name: Setup Wireguard Server
+  hosts: all
+  become: true
+  roles: 
+    - setup_wireguard_server

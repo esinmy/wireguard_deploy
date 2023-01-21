@@ -1,0 +1,14 @@
+{% for client in clients %}
+# Name: {{ client }}
+{% set current_ip_last_number = loop.index + 1 %}
+[Interface]
+PrivateKey = {{ private_client_key.results[loop.index-1].stdout }}
+Address = 10.8.0.{{ current_ip_last_number }}/32
+DNS = 1.1.1.1
+
+[Peer]
+PublicKey = {{ public_server_key.stdout }}
+AllowedIPs = 0.0.0.0/1, 128.0.0.0/1, ::/1, 8000::/1
+Endpoint = {{ ansible_host }}:{{ wireguard_server_port }}
+
+{% endfor %}

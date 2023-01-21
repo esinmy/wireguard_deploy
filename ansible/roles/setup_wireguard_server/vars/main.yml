@@ -1,0 +1,6 @@
+clients:
+  - "max_laptop"
+  - "max_phone"
+  - "nat_phone"
+  - "nat_tablet"
+  - "kat_phone"

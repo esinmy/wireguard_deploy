@@ -1,0 +1,15 @@
+[Interface]
+Address = 10.8.0.1/24
+PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+ListenPort = {{ wireguard_server_port }}
+PrivateKey = {{ private_server_key.stdout }}
+
+{% for client in clients %}
+{% set current_ip_last_number = loop.index + 1 %}
+[Peer]
+# Name: {{ client }}
+PublicKey = {{ public_client_key.results[loop.index-1].stdout }}
+AllowedIPs = 10.8.0.{{ current_ip_last_number }}/32
+
+{% endfor %}

@@ -1,0 +1,32 @@
+ya_service_account_key_file   = "PATH_TO_YOUR_YA_SERVICE_ACCOUNT_KEY_FILE"
+ya_cloud_id                   = "YOUR_YA_CLOUD_ID"
+ya_folder_id                  = "YOUR_YA_FOLDER_ID"
+ya_zone                       = "ru-central1-a"
+personal_private_ssh_key_path = "PATH_TO_PRIVATE_SSH_KEY"
+personal_pub_ssh_key          = "YOUR_PERSONAL_PUBLIC_SSH_KEY"
+username                      = "YOUR_USERNAME" 
+vms                           = [{  metainfo = {
+                                        name          = "mvps-1"
+                                        image_family  = "ubuntu-2004-lts"
+                                        subnet        = "default-ru-central1-a"
+                                        }
+                                    resources = {
+                                        cores         = 4
+                                        core_fraction = 20
+                                        memory        = 2
+                                        disk_size     = 100
+                                    }
+                                },
+                                {   metainfo = {
+                                        name          = "mvps-2"
+                                        image_family  = "ubuntu-2004-lts"
+                                        subnet        = "default-ru-central1-a"
+                                        }
+                                    resources = {
+                                        cores         = 4
+                                        core_fraction = 20
+                                        memory        = 2
+                                        disk_size     = 100
+                                    }
+                                }]
+user_email                    = "your_email"

@@ -1,0 +1,78 @@
+---
+- name: Update apt cache and install Wireguard
+  apt:
+    name: wireguard
+    update_cache: yes
+
+- name: Create wireguard server private key
+  shell:
+    cmd: wg genkey | tee /etc/wireguard/private_server.key
+  register: private_server_key
+
+- debug:
+    msg: "{{ private_server_key.stdout }}"
+
+- name: Create wireguard server public key
+  shell:
+    cmd: cat /etc/wireguard/private_server.key | wg pubkey | tee /etc/wireguard/public_server.key
+  register: public_server_key
+
+- debug:
+    msg: "{{ public_server_key.stdout }}"
+
+- name: Create wireguard client private key
+  shell:
+    cmd: "wg genkey | tee /etc/wireguard/private_client_{{ item }}.key"
+  loop: "{{ clients }}"
+  register: private_client_key
+
+- debug:
+    msg: "{{ private_client_key }}"
+
+- name: Create wireguard client public key
+  shell:
+    cmd: "cat /etc/wireguard/private_client_{{ item }}.key | wg pubkey | tee /etc/wireguard/public_client_{{ item }}.key"
+  loop: "{{ clients }}"
+  register: public_client_key
+
+- debug:
+    msg: "{{ public_client_key }}"
+
+- name: Apply wireguard wg0 config template
+  template:
+    src: wg0.conf.j2
+    dest: "/etc/wireguard/wg0.conf"
+    mode: 0644
+
+- name: Create config for clients
+  template:
+    src: clients.conf.j2
+    dest: "/etc/wireguard/clients.conf"
+    mode: 0644
+
+- name: packet forwarding enabling
+  lineinfile: 
+    path: /etc/sysctl.conf
+    regexp: '^#net.ipv4.ip_forward=1$' 
+    line: 'net.ipv4.ip_forward=1'
+    backrefs: yes
+
+- name: Apply changes for packet forwarding
+  shell:
+    cmd: sysctl -p
+  register: packet_forwarding_result
+
+- debug:
+    var: packet_forwarding_result
+
+- name: Enable Wireguard service
+  systemd:
+    name: wg-quick@wg0
+    state: started
+    enabled: yes
+
+- name: Copy client configs to a local machine
+  fetch:
+    src: "/etc/wireguard/clients.conf"
+    dest: "../{{ ansible_host }}/"
+    flat: true
